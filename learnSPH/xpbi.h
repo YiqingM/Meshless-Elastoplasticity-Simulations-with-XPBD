@@ -99,6 +99,7 @@ namespace pbd
             double m_lambda;
             double m_particle_volume_0; // initial particle voluem
             std::vector<double> m_particle_volumes;
+            std::vector<double> diff_log_J;
 
             // ── Plasticity ──
             PlasticityModel m_plasticity_model = PlasticityModel::None;

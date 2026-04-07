@@ -33,10 +33,11 @@ learnSPH::plasticity::druckerPragerReturnMapping(
     double mu,
     double lambda,
     double alpha,
-    double cohesion)
+    double cohesion,
+    double diff_log_J)
 {
     // hencky strain
-    const Eigen::Vector3d strain = S_trial.array().log();
+    const Eigen::Vector3d strain = S_trial.array().log() + diff_log_J / 3.0;
     const Eigen::Vector3d strain_dev = strain - strain.mean() * Eigen::Vector3d::Ones();
     const double trace_strain = strain.sum();
 

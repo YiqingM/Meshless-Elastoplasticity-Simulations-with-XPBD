@@ -41,6 +41,7 @@ namespace pbd
         m_lambda = lambda;
         m_particle_volume_0 = particle_volume;
         m_particle_volumes.assign(n, particle_volume);
+        diff_log_J.assign(n, 0.0);
  
         // Simulation parameters
         m_particle_radius = particle_radius;
@@ -367,7 +368,7 @@ namespace pbd
                     else if (m_plasticity_model == PlasticityModel::DruckerPrager)
                     {
                         auto pr = learnSPH::plasticity::druckerPragerReturnMapping(
-                            S, m_mu, m_lambda, m_dp_alpha, m_dp_cohesion);
+                            S, m_mu, m_lambda, m_dp_alpha, m_dp_cohesion, diff_log_J[i]);
                         // if plasticity exists
                         if (pr.deltaGamma > 0.0)
                         {
@@ -561,7 +562,7 @@ namespace pbd
 
             // F^{n+1} = (I + Δt ∇v^{n+1}) F^n   (Eq. 22)
             Eigen::Matrix3d F_new = (Eigen::Matrix3d::Identity() + vel_grad * m_dt) * m_F[i];
-
+            double log_det_trial = std::log(F_new.determinant());
             // Return mapping on the stored F (Eq. 22: Z applied)
             if (m_plasticity_model == PlasticityModel::VonMises)
             {
@@ -578,11 +579,11 @@ namespace pbd
             {
                 Eigen::JacobiSVD<Eigen::Matrix3d> svd(F_new, Eigen::ComputeFullU | Eigen::ComputeFullV);
                 auto pr = learnSPH::plasticity::druckerPragerReturnMapping(
-                    svd.singularValues(), m_mu, m_lambda, m_dp_alpha, m_dp_cohesion);
+                    svd.singularValues(), m_mu, m_lambda, m_dp_alpha, m_dp_cohesion, diff_log_J[i]);
                 if (pr.deltaGamma > 0.0)
                     F_new = svd.matrixU() * pr.S.asDiagonal() * svd.matrixV().transpose();
             }
-
+            diff_log_J[i] += -std::log(F_new.determinant()) + log_det_trial;
             m_F[i] = F_new;
         }
     }

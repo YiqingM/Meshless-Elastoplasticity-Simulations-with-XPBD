@@ -22,6 +22,7 @@ namespace learnSPH
             double mu,
             double lambda,
             double alpha, // friction angle parameter
-            double cohesion); // cohesion parameter to provide chuncky behavior
+            double cohesion,
+            double diff_log_J); // cohesion parameter to provide chuncky behavior
     }
 }
