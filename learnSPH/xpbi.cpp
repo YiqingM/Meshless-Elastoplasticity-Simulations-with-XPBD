@@ -92,6 +92,9 @@ namespace pbd
             double yield_stress = (plasticity_params.size() > 0) ? plasticity_params[0] : 0.0;
             m_vm_ksai = (plasticity_params.size() > 1) ? plasticity_params[1] : 0.0;
             m_vm_q.assign(n, yield_stress);
+            m_constitutive_config = {m_mu, m_lambda, 
+                                        m_plasticity_model == PlasticityModel::VonMises,
+                                        0.0};
         }
         else if (plasticity_model == PlasticityModel::DruckerPrager)
         {
@@ -102,6 +105,9 @@ namespace pbd
                 m_dp_alpha = std::sqrt(2.0 / 3.0) *
                             (2.0 * std::sin(friction_angle) /
                             (3.0 - std::sin(friction_angle)));
+                m_constitutive_config = {m_mu, m_lambda, 
+                                            m_plasticity_model == PlasticityModel::DruckerPrager,
+                                            m_dp_cohesion};
             }
         }
 
@@ -378,7 +384,7 @@ namespace pbd
                         }
                     }
                     //     4. constitutive: evaluate C and dC/dF
-                    auto cr = learnSPH::constitutive::evaluateStVKHencky(U, S, V, m_mu, m_lambda);
+                    auto cr = learnSPH::constitutive::evaluateStVKHencky(U, S, V, m_constitutive_config);
                     if (cr.C <= 0.0) continue;
 
                     //     5. compute Δλ, update velocities

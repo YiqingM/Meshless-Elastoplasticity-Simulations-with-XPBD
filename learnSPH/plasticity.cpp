@@ -46,7 +46,7 @@ learnSPH::plasticity::druckerPragerReturnMapping(
     if (trace_strain > 3.0 * cohesion)
     {
         // tensile case
-        return {Eigen::Vector3d::Constant(std::exp(cohesion)), 1.0};
+        deltaGamma = strain_dev.norm();
     }
     else
     {

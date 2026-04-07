@@ -7,9 +7,12 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <fstream>
+#include "constitutive.h"
 
 namespace pbd
 {
+    using ConstitutiveConfig = learnSPH::constitutive::Config;
+
     enum class PlasticityModel
     {
         None,
@@ -99,6 +102,7 @@ namespace pbd
             double m_lambda;
             double m_particle_volume_0; // initial particle voluem
             std::vector<double> m_particle_volumes;
+            ConstitutiveConfig m_constitutive_config;
 
             // ── Plasticity ──
             PlasticityModel m_plasticity_model = PlasticityModel::None;

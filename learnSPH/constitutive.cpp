@@ -5,36 +5,35 @@ learnSPH::constitutive::ConstraintResult learnSPH::constitutive::evaluateStVKHen
                 const Eigen::Matrix3d& U,
                 const Eigen::Vector3d& S,
                 const Eigen::Matrix3d& V,
-                double mu,
-                double lambda)
+                Config const& config)
 {
-    // calculate Hencky strain
-    const Eigen::Vector3d henckystrain = S.array().log();
+    const Eigen::Vector3d strain = S.array().log();
+    const double trace = strain.sum();
 
-    // calculate trace of Hencky strain and trace of squared Hencky strain
-    const double trace_hencky = henckystrain.sum();
-    const double trace_hencky_squared = henckystrain.squaredNorm();
+    double psi;
+    Eigen::Matrix3d dPsidS = Eigen::Matrix3d::Zero();
 
-    // calculate psi
-    const double psi = mu * trace_hencky_squared + 0.5 * lambda * trace_hencky * trace_hencky;
+    if (config.granular && trace >= 3.0 * config.cohesion)
+    {
+        const Eigen::Vector3d strain_dev = strain - (trace / 3.0) * Eigen::Vector3d::Ones();
+        psi = config.mu * strain_dev.squaredNorm();
 
-    // calculate constraint value C
+        for (int i = 0; i < 3; i++)
+            dPsidS(i, i) = 2.0 * config.mu * strain_dev[i] / S[i];
+    }
+    else
+    {
+        psi = config.mu * strain.squaredNorm() + 0.5 * config.lambda * trace * trace;
+
+        for (int i = 0; i < 3; i++)
+            dPsidS(i, i) = (2.0 * config.mu * strain[i] + config.lambda * trace) / S[i];
+    }
+
     const double C = std::sqrt(2.0 * psi);
 
-    if (C < 1e-8) {
-        // Avoid division by zero, return zero gradient
+    if (C < 1e-8)
         return {0.0, Eigen::Matrix3d::Zero()};
-    }
 
-    // calculate gradient dC/dF^E
-    Eigen::Matrix3d dPsidS = Eigen::Matrix3d::Zero();
-    for (size_t i = 0; i < 3; i++)
-    {
-        dPsidS(i, i) = (2.0 * mu * henckystrain[i] + lambda * trace_hencky) / S[i];
-    }
-
-    // dC/dF = P / C
     Eigen::Matrix3d dCdF = (U * dPsidS * V.transpose()) / C;
-
     return {C, dCdF};
 }
