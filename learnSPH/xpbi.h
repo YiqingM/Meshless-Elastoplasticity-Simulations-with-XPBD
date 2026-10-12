@@ -43,7 +43,7 @@ namespace pbd
             const std::string& output_dir = "./",
             bool use_cfl = false,
             double smoothing_length_ratio = 2.4,
-            double position_correction_coeff = 0.25,
+            double position_correction_coeff = 0.75,
             double position_correction_alpha = 1.0
         );
 

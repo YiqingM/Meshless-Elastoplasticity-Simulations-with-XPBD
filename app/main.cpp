@@ -41,7 +41,7 @@ int main()
     double cohesion = 0.00;
 
     double smoothing_ratio = 2.4;
-    double pc_coeff = smoothing_ratio * particle_radius - 0.75 * smoothing_ratio * particle_radius;
+    double pc_coeff = 0.75; 
     double pc_alpha = 0.0; // hard constraint
 
     pbd::XPBISolver solver;

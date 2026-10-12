@@ -8,3 +8,5 @@ set(SOURCE_FILES
 add_executable(learnSPH_app ${SOURCE_FILES})
 add_dependencies(learnSPH_app learnSPH)
 target_link_libraries(learnSPH_app learnSPH)
+add_executable(learnSPH_sand_collapse sand_collapse.cpp)
+target_link_libraries(learnSPH_sand_collapse learnSPH)
