@@ -39,12 +39,15 @@ int main(int argc, char** argv)
     double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
     double mu = E / (2 * (1 + nu));
 
+    double g        = argc > 7 ? std::atof(argv[7]) : 9.81;
+
     pbd::XPBISolver solver;
     solver.initialize(pos, minv, vel, r,
                       steps, 10, dt, 60.0, V, mu, lambda,
                       pbd::PlasticityModel::None, {},
                       out, false,
                       2.4, pc_coeff, 0.0);
+    solver.setGravity({0.0, 0.0, -g});
     solver.run();
     return 0;
 }

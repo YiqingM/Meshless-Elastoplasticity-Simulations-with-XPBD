@@ -49,6 +49,8 @@ namespace pbd
 
         void run();
 
+        void setGravity(const Eigen::Vector3d& g) { m_gravity = g; }
+
         void addTriangleBoundaryMesh(
             const std::vector<Eigen::Vector3d>& vertices,
             const std::vector<std::array<int, 3>>& triangles
